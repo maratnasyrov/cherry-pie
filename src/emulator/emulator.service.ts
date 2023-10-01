@@ -25,7 +25,6 @@ export class EmulatorService {
     } = await this.serverService.init({
       token,
       game: input.game,
-      serverUrl: input.serverUrl,
     });
 
     const id = `${input.playerId}_${input.game}_${input.currency}`;
@@ -55,7 +54,6 @@ export class EmulatorService {
         token: input.token,
         clientId: input.clientId,
         game: input.game,
-        serverUrl: input.serverUrl,
       });
 
       if (result.step.gamble?.available.length > 0) {
@@ -63,7 +61,6 @@ export class EmulatorService {
           token: input.token,
           clientId: input.clientId,
           game: input.game,
-          serverUrl: input.serverUrl,
         });
       }
 

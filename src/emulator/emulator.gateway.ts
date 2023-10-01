@@ -25,7 +25,6 @@ export class EmulatorGateway {
       playerId: eventData.playerId,
       currency: eventData.currency,
       balance: eventData.balance,
-      serverUrl: eventData.serverUrl,
     });
 
     client.emit('initialize', { id, data });
@@ -38,7 +37,6 @@ export class EmulatorGateway {
       playerId: eventData.playerId,
       currency: eventData.currency,
       balance: eventData.balance,
-      serverUrl: eventData.serverUrl,
     });
 
     client.emit('configuration', { id, data });
@@ -58,7 +56,6 @@ export class EmulatorGateway {
       game: eventData.game,
       token: eventData.token,
       betCount: eventData.betCount,
-      serverUrl: eventData.serverUrl,
       clientId: eventData.clientId,
     });
 

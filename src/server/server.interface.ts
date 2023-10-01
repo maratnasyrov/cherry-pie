@@ -1,7 +1,6 @@
 export type BaseProps = {
   token: string;
   game: string;
-  serverUrl: string;
 };
 
 export type InitProps = BaseProps;

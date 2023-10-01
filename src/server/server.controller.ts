@@ -17,7 +17,6 @@ export class ServerController {
   @Post('init')
   async init(@Body() input: InitProps): Promise<InitReturn> {
     const data = await this.serverService.init({
-      serverUrl: input.serverUrl,
       token: input.token,
       game: input.game,
     });
@@ -29,7 +28,6 @@ export class ServerController {
   async bet(@Body() input: BetProps): Promise<any> {
     const bet = await this.serverService.bet({
       clientId: input.clientId,
-      serverUrl: input.serverUrl,
       token: input.token,
       game: input.game,
       bet: input.bet,
@@ -42,7 +40,6 @@ export class ServerController {
   async gamble(@Body() input: GambleProps): Promise<any> {
     const gamble = await this.serverService.gamble({
       clientId: input.clientId,
-      serverUrl: input.serverUrl,
       token: input.token,
       gambleId: input.gambleId,
       game: input.game,
@@ -55,7 +52,6 @@ export class ServerController {
   async collect(@Body() input: CollectProps): Promise<any> {
     const collect = await this.serverService.collect({
       clientId: input.clientId,
-      serverUrl: input.serverUrl,
       token: input.token,
       game: input.game,
     });

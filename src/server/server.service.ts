@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   BetProps,
   BetReturn,
@@ -9,16 +9,22 @@ import {
   InitReturn,
 } from './server.interface';
 import { catchError, firstValueFrom } from 'rxjs';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ServerError, ServerException } from './server.exception';
+import serverConfig from './server.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class ServerService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    @Inject(serverConfig.KEY)
+    private readonly config: ConfigType<typeof serverConfig>,
+    private readonly httpService: HttpService
+  ) {}
 
   async init(input: InitProps): Promise<InitReturn> {
     const data = await this.send<InitReturn>(
-      `${input.serverUrl}/gameplay/init`,
+      'init',
       { game: input.game },
       { headers: { Authorization: `Bearer ${input.token}` } }
     );
@@ -28,7 +34,7 @@ export class ServerService {
 
   async bet(input: BetProps): Promise<BetReturn> {
     const data = await this.send<BetReturn>(
-      `${input.serverUrl}/gameplay/command`,
+      'command',
       { clientId: input.clientId, command: 'bet', payload: { bet: input.bet } },
       { headers: { Authorization: `Bearer ${input.token}` } }
     );
@@ -38,7 +44,7 @@ export class ServerService {
 
   async gamble(input: GambleProps): Promise<any> {
     const data = await this.send(
-      `${input.serverUrl}/gameplay/command`,
+      'command',
       {
         clientId: input.clientId,
         command: 'gamble',
@@ -52,7 +58,7 @@ export class ServerService {
 
   async collect(input: CollectProps): Promise<any> {
     const data = await this.send(
-      `${input.serverUrl}/gameplay/command`,
+      'command',
       {
         clientId: input.clientId,
         command: 'collect',
@@ -64,16 +70,22 @@ export class ServerService {
 
   private async send<
     TReturn extends Record<string, unknown> = Record<string, unknown>,
-  >(url: string, data: any, config: any): Promise<TReturn> {
-    const response = await firstValueFrom<AxiosResponse>(
-      this.httpService.post(url, data, config).pipe(
-        catchError((error: AxiosError) => {
-          throw new ServerException(ServerError.BadRequest, 'Bad request', {
-            data: data,
-            response: error.response?.data,
-          });
-        })
-      )
+  >(
+    url: string,
+    data: Record<string, unknown>,
+    config: AxiosRequestConfig<any>
+  ): Promise<TReturn> {
+    const response = await firstValueFrom<AxiosResponse<TReturn>>(
+      this.httpService
+        .post(`${this.config.serverUrl}/gameplay/${url}`, data, config)
+        .pipe(
+          catchError((error: AxiosError) => {
+            throw new ServerException(ServerError.BadRequest, 'Bad request', {
+              data: data,
+              response: error.response?.data,
+            });
+          })
+        )
     );
 
     return response.data;
