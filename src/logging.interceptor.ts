@@ -30,7 +30,6 @@ export class LoggingInterceptor implements NestInterceptor {
             headers: request.headers,
             body: request.body,
           },
-          response: err.meta.response,
         };
 
         if (err instanceof AppException) {
@@ -40,7 +39,7 @@ export class LoggingInterceptor implements NestInterceptor {
         }
 
         return throwError(() => err);
-      }),
+      })
     );
   }
 }

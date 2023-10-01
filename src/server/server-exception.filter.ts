@@ -13,7 +13,7 @@ import { AppError, AppException } from '../app.exception';
 export class ServerExceptionFilter implements ExceptionFilter {
   catch(
     exception: AppException<number> | BadRequestException | NotFoundException,
-    host: ArgumentsHost,
+    host: ArgumentsHost
   ): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -21,8 +21,8 @@ export class ServerExceptionFilter implements ExceptionFilter {
     let message = '';
 
     if (exception instanceof AppException) {
-      code = Number(exception.meta.response.code);
-      message = exception.meta.response.message;
+      code = Number(exception.meta?.response?.code);
+      message = exception.meta?.response?.message;
     }
 
     response.status(400).json({ code, message });

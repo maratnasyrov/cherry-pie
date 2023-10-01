@@ -5,10 +5,12 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { EmulatorService } from './emulator.service';
-import { UseFilters } from '@nestjs/common';
+import { UseFilters, UseInterceptors } from '@nestjs/common';
 import { EmulatorExceptionsFilter } from './emulator-exception.filter';
+import { EmulatorLoggingInterceptor } from './emulator-logging.interceptor';
 
 @UseFilters(EmulatorExceptionsFilter)
+@UseInterceptors(EmulatorLoggingInterceptor)
 @WebSocketGateway(8080)
 export class EmulatorGateway {
   @WebSocketServer()

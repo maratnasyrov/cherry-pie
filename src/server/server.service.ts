@@ -20,7 +20,7 @@ export class ServerService {
     const data = await this.send<InitReturn>(
       `${input.serverUrl}/gameplay/init`,
       { game: input.game },
-      { headers: { Authorization: `Bearer ${input.token}` } },
+      { headers: { Authorization: `Bearer ${input.token}` } }
     );
 
     return data;
@@ -30,7 +30,7 @@ export class ServerService {
     const data = await this.send<BetReturn>(
       `${input.serverUrl}/gameplay/command`,
       { clientId: input.clientId, command: 'bet', payload: { bet: input.bet } },
-      { headers: { Authorization: `Bearer ${input.token}` } },
+      { headers: { Authorization: `Bearer ${input.token}` } }
     );
 
     return data;
@@ -44,7 +44,7 @@ export class ServerService {
         command: 'gamble',
         payload: { gambleId: input.gambleId },
       },
-      { headers: { Authorization: `Bearer ${input.token}` } },
+      { headers: { Authorization: `Bearer ${input.token}` } }
     );
 
     return data;
@@ -57,7 +57,7 @@ export class ServerService {
         clientId: input.clientId,
         command: 'collect',
       },
-      { headers: { Authorization: `Bearer ${input.token}` } },
+      { headers: { Authorization: `Bearer ${input.token}` } }
     );
     return data;
   }
@@ -70,10 +70,10 @@ export class ServerService {
         catchError((error: AxiosError) => {
           throw new ServerException(ServerError.BadRequest, 'Bad request', {
             data: data,
-            response: error.response.data,
+            response: error.response?.data,
           });
-        }),
-      ),
+        })
+      )
     );
 
     return response.data;

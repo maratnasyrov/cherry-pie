@@ -18,7 +18,5 @@ export class EmulatorExceptionsFilter extends BaseWsExceptionFilter {
     }
 
     client.emit('error', { id, code, message });
-
-    super.catch(exception, host);
   }
 }
