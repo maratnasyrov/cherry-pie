@@ -7,14 +7,16 @@ export class EmulatorExceptionsFilter extends BaseWsExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToWs();
     const client = ctx.getClient();
-    let code = exception.code || AppError.Emulator;
-    let message = '';
-    let id = '';
+    const data = ctx.getData();
+
+    let id = data.id;
+    let code = AppError.Emulator;
+    let message = exception.message;
 
     if (exception instanceof AppException) {
-      id = exception.meta.id;
+      id = exception.meta.id || id;
       code = exception.code;
-      message = exception.message;
+      message = exception.meta?.response.message || message;
     }
 
     client.emit('error', { id, code, message });
