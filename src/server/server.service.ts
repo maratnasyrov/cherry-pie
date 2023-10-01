@@ -5,6 +5,7 @@ import {
   BetReturn,
   CollectProps,
   GambleProps,
+  GambleReturn,
   InitProps,
   InitReturn,
 } from './server.interface';
@@ -42,8 +43,8 @@ export class ServerService {
     return data;
   }
 
-  async gamble(input: GambleProps): Promise<any> {
-    const data = await this.send(
+  async gamble(input: GambleProps): Promise<GambleReturn> {
+    const data = await this.send<GambleReturn>(
       'command',
       {
         clientId: input.clientId,

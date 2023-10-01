@@ -30,18 +30,6 @@ export class EmulatorGateway {
     client.emit('initialize', { id, data });
   }
 
-  @SubscribeMessage('configuration')
-  async onConfiguration(client: any, eventData: any): Promise<void> {
-    const { id, data } = await this.emulatorService.initialize({
-      game: eventData.game,
-      playerId: eventData.playerId,
-      currency: eventData.currency,
-      balance: eventData.balance,
-    });
-
-    client.emit('configuration', { id, data });
-  }
-
   @SubscribeMessage('game-emulation')
   async onGameEmulation(client: any, eventData: any): Promise<void> {
     client.emit('game-emulation', {
@@ -50,16 +38,16 @@ export class EmulatorGateway {
       data: { betCount: eventData.betCount },
     });
 
-    const emulationGenerator = this.emulatorService.gameEmulation({
+    const emulations = this.emulatorService.gameEmulation({
       id: eventData.id,
-      bet: eventData.bet,
       game: eventData.game,
       token: eventData.token,
       betCount: eventData.betCount,
       clientId: eventData.clientId,
+      settings: eventData.settings,
     });
 
-    for await (const betCount of emulationGenerator) {
+    for await (const betCount of emulations) {
       client.emit('game-emulation', {
         id: eventData.id,
         status: 'progress',

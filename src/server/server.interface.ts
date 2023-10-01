@@ -56,7 +56,12 @@ export type BetReturn = {
       totalWin: number;
       gamble?:
         | {
-            available: Array<string>;
+            available?: Array<string>;
+            current?: {
+              id: number;
+              played: number;
+              multiplier: number;
+            };
           }
         | undefined;
       unfinishedStep: boolean;
@@ -64,3 +69,5 @@ export type BetReturn = {
     };
   };
 };
+
+export type GambleReturn = BetReturn;
