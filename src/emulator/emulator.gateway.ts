@@ -46,11 +46,12 @@ export class EmulatorGateway {
   async onGameEmulation(client: any, eventData: any): Promise<void> {
     client.emit('game-emulation', {
       id: eventData.id,
-      status: 'start',
+      status: 'starting',
       data: { betCount: eventData.betCount },
     });
 
     const emulationGenerator = this.emulatorService.gameEmulation({
+      id: eventData.id,
       bet: eventData.bet,
       game: eventData.game,
       token: eventData.token,
@@ -69,7 +70,7 @@ export class EmulatorGateway {
 
     client.emit('game-emulation', {
       id: eventData.id,
-      status: 'end',
+      status: 'ended',
     });
   }
 }

@@ -7,6 +7,7 @@ export type InitializeInput = {
 };
 
 export type GameEmulationInput = {
+  id: string;
   game: string;
   bet: number;
   token: string;

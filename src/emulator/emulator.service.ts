@@ -8,7 +8,7 @@ import { EmulatorError, EmulatorException } from './emulator.exception';
 export class EmulatorService {
   constructor(
     private readonly sessionService: SessionService,
-    private readonly serverService: ServerService,
+    private readonly serverService: ServerService
   ) {}
 
   async initialize(input: InitializeInput) {
@@ -44,7 +44,7 @@ export class EmulatorService {
       throw new EmulatorException(
         EmulatorError.BetCountNumberIncorrect,
         'Bet count incorrect',
-        { input },
+        { ...input }
       );
     }
     let left = input.betCount;
