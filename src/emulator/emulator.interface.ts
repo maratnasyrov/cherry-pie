@@ -1,8 +1,25 @@
+export type CreateInput = {
+  emulatorsCount: number;
+  currency: string;
+  game: string;
+  balance: number;
+};
+
 export type InitializeInput = {
   game: string;
   playerId: string;
   balance: number;
   currency: string;
+};
+
+export type GameEmulationInput = {
+  id: string;
+  betIterations: number;
+};
+
+export type GameEmulationReturn = {
+  id: string;
+  iteration: number;
 };
 
 type SettingsGambleBase<
@@ -19,17 +36,16 @@ type SettingsBetBase<
 type SettingsBetSelect = SettingsBetBase<'select', { value: number }>;
 type SettingsBetRandom = SettingsBetBase<'random', { range: Array<number> }>;
 
-export type GameEmulationSettings = {
+export interface EmulatorSettings {
   gamble?: SettingsGambleSelect | SettingsGambleRandom | null;
   bet: SettingsBetSelect | SettingsBetRandom;
-};
+}
 
-export type GameEmulationInput = {
+export interface Emulator {
   id: string;
   game: string;
   token: string;
   clientId: string;
-  betCount: number;
 
-  settings: GameEmulationSettings;
-};
+  settings: EmulatorSettings;
+}

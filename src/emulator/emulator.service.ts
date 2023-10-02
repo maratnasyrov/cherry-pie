@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { ServerService } from '../server/server.service';
 import { SessionService } from 'src/session/session.service';
-import { GameEmulationInput, InitializeInput } from './emulator.interface';
+import {
+  CreateInput,
+  Emulator,
+  GameEmulationInput,
+  GameEmulationReturn,
+  InitializeInput,
+} from './emulator.interface';
 import { EmulatorError, EmulatorException } from './emulator.exception';
 import { GambleReturn } from 'src/server/server.interface';
+import { randomName } from './emulator.helper';
+
+const emulators: Array<Emulator> = [];
 
 @Injectable()
 export class EmulatorService {
@@ -12,43 +21,45 @@ export class EmulatorService {
     private readonly serverService: ServerService
   ) {}
 
-  async initialize(input: InitializeInput) {
-    const { token } = await this.sessionService.create({
-      game: input.game,
-      playerId: input.playerId,
-      currency: input.currency,
-      balance: input.balance,
-    });
+  async *create(input: CreateInput): AsyncGenerator<Emulator> {
+    for (let index = 0; index < input.emulatorsCount; index += 1) {
+      const emulator = await this.initialize({
+        game: input.game,
+        playerId: randomName(),
+        balance: input.balance,
+        currency: input.currency,
+      });
 
-    const {
-      clientId,
-      currency: { range },
-    } = await this.serverService.init({
-      token,
-      game: input.game,
-    });
+      emulators.push(emulator);
 
-    const id = `${input.playerId}_${input.game}_${input.currency}`;
+      yield emulator;
+    }
 
-    return {
-      id,
-      data: {
-        auth: { token, clientId },
-        currency: { range },
-      },
-    };
+    console.log(emulators);
   }
 
-  async *gameEmulation(input: GameEmulationInput): AsyncGenerator<number> {
-    if (input.betCount === 0 || input.betCount > 10) {
+  async *gameEmulation(
+    input: GameEmulationInput
+  ): AsyncGenerator<GameEmulationReturn> {
+    const emulator = emulators.find((e) => e.id === input.id);
+
+    if (!emulator) {
+      throw new EmulatorException(
+        EmulatorError.EmulatorNotFound,
+        'Emulator not found',
+        { ...input }
+      );
+    }
+    if (input.betIterations === 0 || input.betIterations > 10) {
       throw new EmulatorException(
         EmulatorError.BetCountNumberIncorrect,
         'Bet count incorrect',
         { ...input }
       );
     }
-    let left = input.betCount;
-    const { gamble, bet } = input.settings;
+
+    let left = input.betIterations;
+    const { gamble, bet } = emulator.settings;
 
     while (left > 0) {
       let betId = 0;
@@ -62,9 +73,9 @@ export class EmulatorService {
 
       const { result } = await this.serverService.bet({
         bet: betId,
-        token: input.token,
-        clientId: input.clientId,
-        game: input.game,
+        token: emulator.token,
+        clientId: emulator.clientId,
+        game: emulator.game,
       });
 
       let gambleAvailable = result.step.gamble?.available ?? [];
@@ -86,9 +97,9 @@ export class EmulatorService {
           }
 
           gambleResult = await this.serverService.gamble({
-            token: input.token,
-            clientId: input.clientId,
-            game: input.game,
+            token: emulator.token,
+            clientId: emulator.clientId,
+            game: emulator.game,
             gambleId: gambleId,
           });
 
@@ -104,16 +115,45 @@ export class EmulatorService {
           gambleAvailable = [];
 
           await this.serverService.collect({
-            token: input.token,
-            clientId: input.clientId,
-            game: input.game,
+            token: emulator.token,
+            clientId: emulator.clientId,
+            game: emulator.game,
           });
         }
       }
 
       left = left - 1;
 
-      yield left;
+      yield { id: emulator.id, iteration: left };
     }
+  }
+
+  private async initialize(input: InitializeInput): Promise<Emulator> {
+    const { token } = await this.sessionService.create({
+      game: input.game,
+      playerId: input.playerId,
+      currency: input.currency,
+      balance: input.balance,
+    });
+
+    const {
+      clientId,
+      currency: { range },
+    } = await this.serverService.init({
+      token,
+      game: input.game,
+    });
+
+    const id = `${input.playerId}_${input.game}_${input.currency}`;
+
+    return {
+      id,
+      token,
+      clientId,
+      game: input.game,
+      settings: {
+        bet: { type: 'random', range },
+      },
+    };
   }
 }
