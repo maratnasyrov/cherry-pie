@@ -6,5 +6,5 @@ export const randomName = () => {
   for (let i = 0; i < nameLength; i += 1) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
   }
-  return 'result';
+  return result;
 };

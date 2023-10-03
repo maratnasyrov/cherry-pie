@@ -34,8 +34,6 @@ export class EmulatorService {
 
       yield emulator;
     }
-
-    console.log(emulators);
   }
 
   async *gameEmulation(
@@ -108,9 +106,10 @@ export class EmulatorService {
         }
 
         if (
-          gamble &&
-          gambleCount === gamble.count &&
-          gambleResult?.result.step.gamble?.available?.length > 0
+          !gamble ||
+          (gamble &&
+            gambleCount === gamble.count &&
+            gambleResult?.result.step.gamble?.available?.length > 0)
         ) {
           gambleAvailable = [];
 

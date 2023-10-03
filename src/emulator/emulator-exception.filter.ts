@@ -16,7 +16,7 @@ export class EmulatorExceptionsFilter extends BaseWsExceptionFilter {
     if (exception instanceof AppException) {
       id = exception.meta.id || id;
       code = exception.code;
-      message = exception.meta?.response.message || message;
+      message = exception.meta?.response?.message || message;
     }
 
     client.emit('error', { id, code, message });
